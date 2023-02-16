@@ -1,6 +1,13 @@
 import os
 from flask import Flask, request, redirect, render_template, send_file
+from sklearn.preprocessing import LabelBinarizer
 from werkzeug.utils import secure_filename
+import cv2
+import numpy as np
+import tensorflow as tf
+from keras.models import load_model
+from PIL import Image
+from tensorflow.keras import preprocessing
 
 UPLOAD_FOLDER = './images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -39,4 +46,36 @@ def display_image(filename):
 @app.route('/infos/<filename>')
 def infos_for_image(filename):
     # Mettre ici le programme IA pour retourner la lettre
-    return render_template("index.html", user_image = "http://localhost:5000/get-image/"+filename, lettre="A")
+    model = load_model('model/CNN_1.h5')
+    model.load_weights('model/CNNWeights_1.h5')
+    
+    image = Image.open("./images/"+filename)
+    
+    test_image = image.resize((64,64))
+    test_image = preprocessing.image.img_to_array(test_image)
+    test_image = test_image / 255
+    test_image = np.expand_dims(test_image, axis =0)
+
+    # Liste des classes
+    class_names = [
+        "a", "b", "c",
+        "d", "e", "f",
+        "g", "h", "i",
+        "j", "k", "l",
+        "m", "n", "o",
+        "p", "q", "r",
+        "s", "t", "u",
+        "v", "w", "x",
+        "y", "z", "0",
+        "1", "2", "3",
+        "4", "5", "6",
+        "7", "8", "9"
+    ]
+        
+    predictions = model.predict(test_image)
+    scores = tf.nn.softmax(predictions[0])
+    scores = scores.numpy()
+    image_class = class_names[np.argmax(scores)]
+    print(image_class)
+
+    return render_template("index.html", user_image = "http://localhost:5000/get-image/"+filename, lettre=image_class)
