@@ -8,6 +8,7 @@ import tensorflow as tf
 from keras.models import load_model
 from PIL import Image
 from tensorflow.keras import preprocessing
+from sklearn.metrics import classification_report
 
 UPLOAD_FOLDER = './images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -46,22 +47,49 @@ def display_image(filename):
 @app.route('/infos/<filename>')
 def infos_for_image(filename):
     # Mettre ici le programme IA pour retourner la lettre
-    model = load_model('model/CNN_1.h5')
-    model.load_weights('model/CNNWeights_1.h5')
-    
-    image = Image.open("./images/"+filename)
-    
-    test_image = image.resize((64,64))
-    test_image = preprocessing.image.img_to_array(test_image)
-    test_image = test_image / 255
-    test_image = np.expand_dims(test_image, axis =0)
+    model = load_model('model/CNN.h5')
+    print(model.summary())
+    # model.load_weights('model/CNNWeights_1.h5')
+
+
+    img_to_retrain = []
+
+    i = 10
+    for count in range(5) :
+        img_temp = cv2.imread("./asl_dataset/0/hand1_0_bot_seg_"+str(count+1)+"_cropped.jpeg")
+        img_temp = cv2.resize(img_temp, (64,64))
+        # img_temp = Image.open()
+        # img_temp = img_temp.resize((64,64))
+        # img_temp = np.array(img_temp).astype(int)
+        # print(img_temp.shape)
+        img_to_retrain.append(img_temp)
+    # print(len(img_to_retrain))
+    img_to_retrain = np.array(img_to_retrain)
+    print(type(img_to_retrain))
+    y_pred = model.predict(img_to_retrain, verbose=1)
+    y_pred = np.argmax(y_pred, axis=1)
+    print(classification_report([26,26,26,26,26], y_pred))
+    print(y_pred)
+
+    # image = Image.open("./images/"+filename)
+    image = cv2.imread("./images/"+filename)
+    image = cv2.resize(image, (64,64))
+    imageArray = [image]
+    imageArray = np.array(imageArray)
+    # test_image2 = image.resize((64,64))
+
+    # test_image2 = preprocessing.image.img_to_array(test_image2)
+
+
+    # # test_image = test_image / 255
+    # test_image = np.expand_dims(test_image, axis =0)
 
     # Liste des classes
     class_names = [
         "a", "b", "c",
-        "d", "e", "f",
+        "d", "e","f",
         "g", "h", "i",
-        "j", "k", "l",
+        "j","k", "l",
         "m", "n", "o",
         "p", "q", "r",
         "s", "t", "u",
@@ -72,10 +100,11 @@ def infos_for_image(filename):
         "7", "8", "9"
     ]
         
-    predictions = model.predict(test_image)
+    predictions = model.predict(imageArray)
     scores = tf.nn.softmax(predictions[0])
     scores = scores.numpy()
+    print(scores)
     image_class = class_names[np.argmax(scores)]
-    print(image_class)
+    # print(image_class)
 
     return render_template("index.html", user_image = "http://localhost:5000/get-image/"+filename, lettre=image_class)
