@@ -3,46 +3,23 @@
 <head>
     <title>Index</title>
     <style>
-        @font-face {
-            font-family: 'Rocher';
-            src: url(https://assets.codepen.io/9632/RocherColorGX.woff2);
-          }
-          
-          body {
-            text-align: center;
-            font-size: 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-          }
-          
-          @font-palette-values --Purples {
-            font-family: Rocher;
-            base-palette: 6;
-          }
-          
-          .purples {
-            font-family: 'Rocher';
-            font-palette: --Purples;
-          }
-          .relative {
-            position: relative;
-          }
+      body {
+        background: linear-gradient(#e66465 25%, #9198e5);
+      }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.css" rel="stylesheet" />
 </head>
-<body>
-    <h1 class="purples">Image de la lettre</h1> {{ lettre }}
-    <img src="{{ user_image }}" alt="User Image" width="250" heigth="250">
-    <div class="relative">
-        <canvas class="fireworks"></canvas>
-    </div>
-</body>
-<script>
-    const container = document.querySelector('.fireworks')
-    const fireworks = new Fireworks.default(container)
-    fireworks.start()
-</script>
-</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.js"></script>
+
+<h1 class="mb-4 pt-4 text-3xl text-center font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">Réponse de la lettre de l'image</h1>
+<h2 class="mb-4 pt-4 text-1xl text-center font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">👉 {{ lettre }} 👈</h2>
+<div class="text-center items-center justify-center pt-4">
+<div class="grid h-screen">
+  <div class="m-auto">
+    <center>
+      <img src="{{ user_image }}" width="400" heigth="400">
+    </center>
+  </div>
+</div> 
+</div>
+

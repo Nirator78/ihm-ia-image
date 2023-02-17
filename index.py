@@ -47,33 +47,35 @@ def display_image(filename):
 @app.route('/infos/<filename>')
 def infos_for_image(filename):
     # Mettre ici le programme IA pour retourner la lettre
-    model = load_model('CNNINSHALLAH.h5')
-    print(model.summary())
+    model = load_model('model/the_best_model.h5')
+    # model = load_model('model/CNNVRELOADED.h5')
+    # print(model.summary())
     # model.load_weights('model/CNNWeights_1.h5')
 
 
-    img_to_retrain = []
+    # img_to_retrain = []
 
-    i = 10
-    for count in range(5) :
-        img_temp = cv2.imread("./asl_dataset/0/hand1_0_bot_seg_"+str(count+1)+"_cropped.jpeg")
-        img_temp = cv2.resize(img_temp, (64,64))
-        # img_temp = Image.open()
-        # img_temp = img_temp.resize((64,64))
-        # img_temp = np.array(img_temp).astype(int)
-        # print(img_temp.shape)
-        img_to_retrain.append(img_temp)
-    # print(len(img_to_retrain))
-    img_to_retrain = np.array(img_to_retrain)
-    print(type(img_to_retrain))
-    y_pred = model.predict(img_to_retrain, verbose=1)
-    y_pred = np.argmax(y_pred, axis=1)
-    print(classification_report([26,26,26,26,26], y_pred))
-    print(y_pred)
+    # i = 10
+    # for count in range(5) :
+    #     img_temp = cv2.imread("./asl_dataset/0/hand1_0_bot_seg_"+str(count+1)+"_cropped.jpeg")
+    #     img_temp = cv2.resize(img_temp, (64,64))
+    #     # img_temp = Image.open()
+    #     # img_temp = img_temp.resize((64,64))
+    #     # img_temp = np.array(img_temp).astype(int)
+    #     # print(img_temp.shape)
+    #     img_to_retrain.append(img_temp)
+    # # print(len(img_to_retrain))
+    # img_to_retrain = np.array(img_to_retrain)
+    # print(type(img_to_retrain))
+    # y_pred = model.predict(img_to_retrain, verbose=1)
+    # y_pred = np.argmax(y_pred, axis=1)
+    # print(classification_report([26,26,26,26,26], y_pred))
+    # print(y_pred)
 
     # image = Image.open("./images/"+filename)
     image = cv2.imread("./images/"+filename)
-    image = cv2.resize(image, (64,64))
+    # image = cv2.resize(image, (64,64))
+    image = cv2.resize(image, (224,224))
     imageArray = [image]
     imageArray = np.array(imageArray)
     # test_image2 = image.resize((64,64))
@@ -86,25 +88,48 @@ def infos_for_image(filename):
 
     # Liste des classes
     class_names = [
-        "A", "B", "C",
-        "D", "E", "F",
-        "G", "H", "I",
-        "J", "K", "L",
-        "M", "N", "O",
-        "P", "Q", "R",
-        "S", "T", "U",
-        "V", "W", "X",
-        "Y", "Z", "0",
-        "1", "2", "3",
-        "4", "5", "6",
-        "7", "8", "9"
+        '0','1','2',
+        '3','4','5',
+        '6','7','8',
+        '9','a','b',
+        'c','d','e',
+        'f','g','h',
+        'i','j','k',
+        'l','m','n',
+        'o','p','q',
+        'r','s','t',
+        'u','v','w',
+        'x','y','z'
     ]
+
+    # Liste des classes
+    # class_names = [
+    #     "a", "b", "c",
+    #     "d", "e","f",
+    #     "g", "h", "i",
+    #     "j","k", "l",
+    #     "m", "n", "o",
+    #     "p", "q", "r",
+    #     "s", "t", "u",
+    #     "v", "w", "x",
+    #     "y", "z", "0",
+    #     "1", "2", "3",
+    #     "4", "5", "6",
+    #     "7", "8", "9"
+    # ]
         
     predictions = model.predict(imageArray)
-    scores = tf.nn.softmax(predictions[0])
-    scores = scores.numpy()
-    print(scores)
-    image_class = class_names[np.argmax(scores)]
-    # print(image_class)
+    print("Predictions :")
+    print(predictions)
+    # scores = tf.nn.softmax(predictions[0])
+    print("scores :")
+    # print(scores)
+    # scores = scores.numpy()
+    print("argmax :")
+    # print(np.argmax(scores))
+    # image_class = class_names[np.argmax(scores)]
+    image_class = class_names[np.argmax(predictions)]
+    print("image class :")
+    print(image_class)
 
     return render_template("index.html", user_image = "http://localhost:5000/get-image/"+filename, lettre=image_class)
